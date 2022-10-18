@@ -1,0 +1,8 @@
+创建数组的方法如下
+```
+类型名 数组名[数字or常数]
+比如int arr[10]
+or
+const int Month=12
+short arr[Month]
+```
