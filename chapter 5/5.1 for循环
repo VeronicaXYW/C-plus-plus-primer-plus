@@ -1,0 +1,299 @@
+for 循环的组成部分
+for是入口条件循环，在循环体之前进行检验
+do while是出口循环条件，在完成循环体之后进行检验
+
+Q：为什么for的括号里用分号？
+
+```
+int main() 
+{
+    int x;
+    
+    cout << "x=100 ";
+    cout << (x = 100) << endl;
+    cout << "now x = ";
+    cout << (x < 3) << endl;
+    cout << "x>3 has the value ";
+    cout << (x > 3) << endl;
+
+    cout.setf(ios_base::boolalpha);
+    cout << "now x<3 had the value " << (x < 3) << endl;
+
+    return 0;
+}
+```
+通常，cout会将x<3这种表达式的判断结果显示为1或0，但是cout.setf(ios_base::boolalpha)使cout显示true或者false。
+
+赋值和判断表达式
+x=100; 是赋值
+< > == != 是判断表达式
+
+表达式的副作用
+
+表达式可以单独一行，加分号，成为一条语句，但是如果没有显示也没有把判断结果赋给某个变量，即没有使用到判断结果，那么这条语句是无效的。
+比如，x<3;  程序可以继续执行，然后这条语句没有产生任何作用。
+
+```
+for(int i=0; i<5; i++)//这样声明i，会使得i称为for循环里的局部变量，随着for循环结束而释放。
+	cout <<"C++ knows loops.\n";
+cout<<i<<endl;//会发现找不到i
+```
+但是有些老版本C++的规则是，对于前面的循环，把i视为在循环之前声明的，因此循环结束后i还可用。
+
+回到for循环
+与数组协同，见以下代码
+```
+int main() 
+{
+    const int arrsize = 16;//将数组长度设置成常数，只要来这里修改即可，不需要在整个程序里找到长度数值然后修改。
+    long long fac[arrsize];
+    fac[0] = 1LL;
+    int i;
+    for (i = 1; i < arrsize; i++)
+        fac[i] = fac[i - 1] * i;
+    for (i = 0; i < arrsize; i++)
+        cout << i << " != " << fac[i] << endl;
+	
+    return 0;
+}
+```
+
+修改步长
+每次的递增值可以自己设定
+
+使用for循环访问字符串
+```
+#include<iostream>
+#include<string>
+using namespace std;
+
+int main() 
+{
+    string word;
+    cout << "Please enter a word ";
+    cin >> word;
+
+    for (int i = word.size() - 1; i >= 0; i--)//字符串名称.size()功能可以反馈string类型变量的长度
+        cout << word[i];
+    cout << endl;
+
+    return 0;
+}
+```
+
+递增运算符和递减运算符
+```
+int main()
+{
+	int a=b=20;
+	cout<<"a++= "<<a++<<endl;
+	cout<<"++b= ">>++b<<endl;
+	cout<<"a= "<<a<<endl;
+	cout<<"b= "<<b<<endl;
+}
+```
+++在后，表示先输出后递增。++在前，表示先递增再输出。最终都会呈现出递增了的结果。
+
+副作用和顺序点
+顺序点的作用是，到达顺序点的时候，本条语句的所有操作均已执行完毕，但是语句内部的执行顺序，程序无法保证。
+比如以下两组语句
+```
+while ( guests++ < 10)
+	cout << guests << endl;
+
+y = (4 + x++) + (6 + x++);
+```
+A组语句到while的括号底部是一个顺序点，所以会在先对guests递增，再判断是否小于10。
+B组语句只能保证最终x递增2次。至于在这条语句执行期间，x在具体的什么时候递增，程序无法保证。要尽量避免这种情况。
+```
+int main() 
+{
+    int x = 1, y;
+    y = (4 + x++) + (6 + x++);
+    cout << y << endl;//y=2
+    cout << x << endl;//x=3
+
+    return 0;
+}
+```
+
+前缀格式和后缀格式
+在最终效果上一致。使用内置类型，即C++默认的使用环境，前缀后缀的效率没有区别。但是C++允许用户对运算符进行自定义，这时候前缀后缀的效率会有差别，前缀的效率更高。
+Q：前缀的效率具体怎么高，我还没有体会，所以没看懂。
+
+递增/递减运算符和指针
+```
+int *pt;
+pt=pt+1;
+++pt;
+```
+
+比较星号运算符和前缀后缀的优先级，见以下代码
+```
+int main() 
+{
+    double arr[5] = { 5.6,3.7,4.1,9.2,9.6 };
+    double* pt;
+    pt = &arr[1];
+
+    cout << *++pt << endl;//让指针后移一位，然后输出这一位的内容
+    cout << *--pt << endl;//让指针前移一位，然后输出这一位的内容
+    cout << *pt++ << endl;//输出这一位的内容，然后指针后移一位
+    cout << *pt-- << endl;//输出这一位的内容，然后指针前移一位
+
+    return 0;
+}
+```
+
+组合赋值运算符
+```
+a+=b  a=a+b
+a-=b  a=a-b
+a*=b  a=a*b
+a/=b  a=a/b
+a%=b  a=a%b
+```
+
+复合语句
+用花括号把语句块框起来。否则循环体只取第一条，后面当作循环外的。
+花括号里变量是局部变量。遵循客随主便，进了花括号，就按照花括号里的规则来安排，即使内外部有变量重名。
+```
+int main()
+{
+	using std::cout;
+	using std:endl;
+	int x = 20;
+	{
+		cout << x << endl;//显示20
+		int x = 100;
+		cout << x << endl;//显示100，按照语句块里的定义来
+	}
+	cout << x << endl;
+	
+	return 0;
+}
+```
+
+逗号运算符
+逗号可以把两条语句并列放在一个for循环中，它也是一个语句执行的顺序点。
+交换单词的字母位置，到中间停下，否则又换回去了。见以下代码
+```
+int main() 
+{
+    string word;
+    cout << "Please enter a word: ";
+    cin >> word;
+
+    int i, j;
+    //for (i = 0, j = word.size() - 1; i < word.size() - 1; i++, j--)//这条语句也可以得到相同的结果
+    for (i = 0, j = word.size() - 1; i < word.size() / 2; i++, j--)
+    {
+        char temp;
+        temp = word[i];
+        word[i] = word[j];
+        word[j] = temp;
+    }
+
+    cout << "Now the word becomes " << word << endl;
+
+    return 0;
+}
+```
+
+逗号运算符还有一个规则，取逗号后面的值。逗号的优先级是最低的。
+逗号+小括号，看优先级，见以下代码
+```
+
+```
+
+关系表达式
+```
+< <=
+> >=
+== !=
+```
+注意区分等于判断是双等号，赋值是单等号。犯这种错误，程序往往不会报错，于是查不出哪里有问题。
+
+比较C风格的字符串
+char类型的字符串
+调整1个字符串的开头，直至与另一个字符串一致。见以下代码
+```
+#include<iostream>
+#include<cstring>//包含strcpm()
+using namespace std;
+
+int main() 
+{
+    char word[5] = "?ate";
+    /*
+    不能用这种方式给字符串赋值
+    char word[5];
+    word[5] = "?ate";
+    会报错，显示不能从const char*给char*赋值。
+    因为"?ate"是一个常量字符串，word[5]是变量字符串。
+    假如可以这样赋值的话,那么通过char*就可以修改const char指向的内容了。
+    只能在同一条语句内直接赋值。
+    */
+
+    for (word[0] = 'a'; strcmp(word, "mate"); word[0]++)
+    {
+        cout << word << endl;
+    }
+    cout << "OK" << endl;
+    cout << "Now word is " << word << endl;
+
+    return 0;
+}
+```
+
+详细介绍strcpm()这个函数的功能，见以下代码
+```
+//第一个字符串在第二个字符串之前，返回一个负数值。对于字符串，只比较首字母。
+    int a = strcmp("Zoo", "aq");
+    cout << a << endl;
+    int b = strcmp("Z", "a");
+    cout << b << endl;
+
+    //第一个字符串与第二个字符串相等，返回0
+    int c = strcmp("k", "k");
+    cout << c << endl;
+
+    //第一个字符串在第二个字符串之后，返回一个整数值
+    int d = strcmp("p", "Q");
+    cout << d << endl;
+```
+Q：strcmp()这个函数怎么比较两串字符串的大小？比较ASCII码总和吗？
+不是比较总和。而是逐个比下去，直到比出大小来。如果直到最后都没有发现谁大谁小，说明两串字符串内容完全一致，输出0。
+比如AF和BE，在第一位就发现前者对应的编码数字更小，则输出-1。
+比如AE和AF的比较结果是-1，因为比到第二位发现前者对应的编码数字更小。
+
+比较string类型的字符串
+
+```
+#include<iostream>
+#include<string>
+using namespace std;
+
+int main() 
+{
+    string word = "?ate";
+    /*
+    不能用这种方式给字符串赋值
+    char word[5];
+    word[5] = "?ate";
+    会报错，显示不能从const char*给char*赋值。
+    因为"?ate"是一个常量字符串，word[5]是变量字符串。
+    假如可以这样赋值的话,那么通过char*就可以修改const char指向的内容了。
+    只能在同一条语句内直接赋值。
+    */
+
+    for (word[0] = 'a'; word != "mate"; word[0]++)
+    {
+        cout << word << endl;
+    }
+    cout << "OK" << endl;
+    cout << "Now word is " << word << endl;
+
+    return 0;
+}
+```
