@@ -1,0 +1,43 @@
+enum是用来使用枚举类型结构体的，大部分规则都和结构体一致，使用方法在以下例子中展示
+```
+enum spectrum{ red, orange, yellow, green, blue, violet, indigo, ultraviolet };
+
+spectrum band;
+band = red;//valid
+
+```
+red, orange, yellow等作为符号常量，对应数值0-7，这些数值又称为枚举量，必须是整数。以后会提到如何修改这些默认的枚举量。
+
+续以上的例子
+```
+band = 5;//invalid
+band = spectrum(3);//valid
+band = spectrum(403);//invalid。枚举体里没有这一位。
+
+int color = blue;//blue这个元素会转为对应的数值，赋给color，因为color只是一个int变量。
+color = 3 + red;
+band = green + violet;//band是基于spectrum枚举体建立的对象，所以只能赋元素内容，不会转为数值。而且本条语句是invalid。
+```
+
+可以省略枚举类型的名字，同样不建议。
+
+设置枚举量的值，同样必须是整数，正负均可
+```
+enum bits{ one=1, two=2, eight=8 };//可以全部自定义
+enum bigstep{ first, second=100, third };//也可以部分自定义
+enum samestep{ null, zero=0, one, same_one=1 };//自定义的枚举量可以相同
+```
+
+枚举的取值范围
+上限是，大于最大枚举量的、最小的2的幂，将它减去1。比如最大枚举量是101，那么就是2的7次方128-1=127。
+下限，如果枚举量的最小值大于0，则下限为0；如果最小值小于0，和寻找上限的方法对称。比如最小枚举量是-6，那么就是2的3次方的负数，即-8+1=-7就是下限。
+
+```
+{
+	enum bigstep { first, second = 100, third };
+	bigstep step1;
+	step1 = bigstep(-2);
+	cout << step1 << endl;
+}
+```
+但是我在这段代码里取什么值都能顺利运行
