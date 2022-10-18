@@ -1,0 +1,139 @@
+一个例子：建立两个常规变量，一个int，一个double，查看系统把它们存到什么地址去。有些系统先存int再存double，于是double的地址在int后面4位。有些系统先存double再存int，于是double在int前面8位。有些系统会存在互不相干的地方。
+&是取地址符
+使用常规变量的时候，值是指定的量，地址为派生量。
+
+题外话：解释面向对象编程（又称OOP）的特点：在程序运行阶段进行决策，而非编译阶段。
+比如大部分情况下需要长度20的数组，小部分时候需要长度为100的数组。过程性编程会统一提供长度为100的数组空间，以防止出现空间不够用的情况。但是这样很浪费。OOP则会把创建多大的数组空间这个决策放到运行阶段。
+
+指针是将地址视为指定量，将内部存储的值视为派生量。
+
+创建指针并初始化
+```
+int* p_update;
+int update=6;
+*p_update=update;或者p_update=&update;
+//p_update是指针，*p_update是int。
+```
+小习惯，标示指针的星号左右的空格是可选的。在C语言中，习惯将星号和指针名放在一起。在C++中，习惯将星号和类型放在一起。
+
+可以在声明语句中初始化指针，此时被初始化的是指针，而不是它指向的值。
+```
+int higgens=5;
+int* pt = &higgens;
+```
+此处是将pt的值设置为&higgens，不是pt指针。
+根据这个例子我发现，还是把星号和类型放在一起，这种写法更合适，可以体现是将higgens的地址给指针，如果写pt会以为是把higgens的地址给指针。
+
+long* fellow;
+表示fellow这个指针里存储着一个long型变量的地址。
+
+创建指针的时候一定要存储地址。因为对指针而言，地址是指定量，值是派生量。（前面说过）
+
+指针存储的是地址而不是数字，所以以下例子会报错
+```
+int* pt;
+pt=0xB8000000;
+```
+在C99版本中，将数字和地址进行区分，不能用数字直接表示地址。除非进行类型转换，如以下语句
+```
+pt=(int*)0xB8000000;
+```
+注意，数据长度不等于地址长度。比如short的数据长度是2个字节，地址长度可能是4个字节。
+
+使用new来分配内存
+程序员告诉new需要为哪种数据分配内存，new找到长度正确的内存块，返回该内存块的地址，程序员需要将该地址赋给一个指针。
+```
+int* pn = new int;
+```
+根据类型来确定需要多少字节的内存，找到之后赋给pn这个指针
+
+常规变量的值存在栈这种内存区域中，new会从堆或自由存储区分配内存。（第9章会详细讨论）
+
+如果内存被耗尽，new会返回0，此时创建了一个没有任何值但是有地址的空指针。（第15章会详细讨论）
+
+使用new之后记得用delete释放内存，释放后指针还存在，可以指向其他对象。缺少这一步，会发生内存泄露。即被分配的内存再也无法使用了。但是也不要释放已经释放过的内存。
+```
+int* ps=new int;
+...
+delete ps;
+
+int* pi=&jugs;
+delete pi;//不允许，因为没有使用new为pi指定内存。换句话说，pi此时存着地址，地址里存着指针，但是pi没有指定的地址。
+```
+
+使用new和指针来创建动态数组
+```
+int* psome = new int [10];//创建一个包含10个int类型数据的数组。此时的psome是指向数组递一个元素的指针。
+delete [] psome;
+
+int* pt = new int;
+delete pt;
+
+//创建和释放的类型要一致，所以创建数组的时候有[]，释放的时候也有[]
+```
+直接声明数组变量，和使用new和指针相比更方便，但是后者适合用于大型数据。因为前者在声明的时候直接分配好了，称为静态联编，后者可以在运行时根据实际情况决定分配多少内存空间，称为动态联编。
+
+创建好了动态数组，如何使用呢？在C++中，数组和指针的访问基本等价。所以可以用以下方法来使用
+```
+#include"test.h"
+
+/*
+设置2个数组
+创建两个指针，一个指向double类型(*pb)，一个指向int数组(*pa)。
+两种指针有不同的访问值、地址的方式，改变两种指针内容的方法也不同。
+对指针+1，会发现改变的是地址而不是内部的值。
+再计算数组和指针的尺寸，也有差别。
+*/
+
+void addpntrs()
+{
+	double arr1[3] = { 10.2,20.5,30.7 };
+	int arr2[5] = { 8,4,2 };
+	
+	double* pb = arr1;//可以直接用数组名
+	int* pa = &arr2[0];//也可以取数组第一位的地址
+
+	//访问值。可以在用*指针名的方式，也可以用指针名[位数]
+	cout << "visit first element in arr1 with pointer " << *pb << endl;
+	cout << "or we can " << arr1[0] << endl;
+	cout << "visit third element in arr1 with pointer " << pb[2] << endl;
+	cout << "or we can " << *(pb + 2) << endl;
+	cout << "visit second element in arr2 with pointer " << pa[1] << endl;
+	cout << "or we can " << arr2[1] << endl;
+
+	//访问地址
+	cout << "visit first element's address in arr1 with pointer " << pb << endl;
+	cout << "or we can " << &arr1[0] << endl;
+	cout << "visit second element in arr2 with pointer " << &pa[1] << endl;
+	cout << "or we can " << &arr2[1] << endl;
+
+	//+1
+	pb = pb + 1;
+	cout << "now visit pb will be " << *pb << endl;
+	cout << "first element's address will be " << pb << endl;
+	pa = pa + 3;
+	cout << "now first element in arr2 is " << pa[0] << endl;
+	//arr2的第一位元素变成了原本的第四位元素，5个位置只赋了前3个值，余下的默认为0。
+	cout << "first element's address will be " << &pa[0] << endl;
+
+	//计算尺寸，sizeof
+	cout << sizeof(arr1) << endl;//24位
+	cout << sizeof(pb) << endl;//8位
+	cout << sizeof(pa) << endl;//8位
+}
+```
+
+```
+short (*pas) [20] = &tell;//一种给指针赋值的方法
+```
+
+指针小结：
+如何声明？
+如何给指针赋值？
+指针存储的地址和指针指向的值
+为指针创建内存地址，用完后释放
+指针算数，如何影响地址？如何影响内部的值？对数组做加减无法影响地址。
+数组的
+数组的静态联编和动态联编：使用数组；将数组赋给指针，此时指针存储的地址是数组的第一位，如何释放？用取地址符访问数组的时候，得到的也是第一位的地址。
+
+书中使用strcpy()，在vs2022中需使用strcpy_s()。
